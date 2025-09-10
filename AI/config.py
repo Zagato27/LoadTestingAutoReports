@@ -40,7 +40,13 @@ CONFIG = {
                 "https": "",
                 "http": ""
             },
-            "connect_timeout_sec": 5
+            "connect_timeout_sec": 5,
+            # mTLS режим прямых REST-запросов
+            "use_mtls": False,
+            "cert_file": "",
+            "key_file": "",
+            # verify может быть True/False или путем к CA файлу
+            "verify": ""
         }
     },
     "default_params": {
@@ -132,7 +138,7 @@ CONFIG = {
         "kafka": {
             "promql_queries": [
                 'sum(kafka_consumer_fetch_rate{topic !~ "_.+" , topic!~".*searched$", topic!="apps-registry.nsi.document-request"}) by (client_id)',
-                'sum by (topic, consumergroup) (kafka_consumergroup_lag{consumergroup!~"apps-apps-micro-registry-incident-AT.*", topic !~ "__.+", topic!~".*searched$", topic!="apps-registry.nsi.document-request"})',
+                'sum by (topic, consumergroup) (kafka_consumergroup_lag{consumergroup!~"apps-apps-micro-registry-incident-AT.*", topic ! ~ "__.+", topic!~".*searched$", topic!="apps-registry.nsi.document-request"})',
                 'NSI_incident_repository_gauge'
                 '{application="micro-registry-incident-schedule", repository="KafkaRequest"}'
             ],
