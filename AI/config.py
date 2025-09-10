@@ -38,6 +38,26 @@ CONFIG = {
         "step": "1m",
         "resample_interval": "10T"
     },
+    # Источник метрик: напрямую из Prometheus или через Grafana proxy (без прямого доступа к Prometheus)
+    "metrics_source": {
+        "type": "prometheus",  # "prometheus" | "grafana_proxy"
+        "grafana": {
+            "base_url": "http://0.0.0.0:3000",
+            "verify_ssl": False,
+            "auth": {
+                "method": "basic",  # "basic" | "bearer"
+                "username": "login",
+                "password": "pass",
+                "token": ""
+            },
+            # Идентификация Prometheus-датасорса в Grafana: можно указать любой из id | uid | name
+            "prometheus_datasource": {
+                "id": None,
+                "uid": "",
+                "name": ""
+            }
+        }
+    },
     "queries": {
         "jvm": {
             "promql_queries": [
