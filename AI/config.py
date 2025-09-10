@@ -28,6 +28,9 @@ CONFIG = {
             "api_base_url": "https://gigachat.devices.sberbank.ru/api/v1",
             "scope": "GIGACHAT_API_PERS",
             "verify_ssl": False,
+            # Если в личном кабинете выдан готовый Authorization key (Basic ...),
+            # его можно указать здесь вместо client_id/client_secret
+            "authorization_key": "",
             "model": "GigaChat-Pro"
         }
     },
