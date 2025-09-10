@@ -14,39 +14,23 @@ CONFIG = {
 
     },
     "llm": {
-        # Провайдер LLM: "perplexity", "openai", "gigachat"
-        "provider": "perplexity",
-        # Для OpenAI-совместимых провайдеров (OpenAI/Perplexity)
-        "api_key": "token",
-        "model": "sonar-deep-research",
-        "base_url": "https://api.perplexity.ai",
-        # Настройки GigaChat (при provider = "gigachat")
+        # Используем только прямые REST-вызовы GigaChat по mTLS
+        "provider": "gigachat",
         "gigachat": {
-            "client_id": "your_client_id",
-            "client_secret": "your_client_secret",
-            "auth_url": "https://ngw.devices.sberbank.ru:9443/api/v2/oauth",
             "api_base_url": "https://gigachat.devices.sberbank.ru/api/v1",
-            "scope": "GIGACHAT_API_PERS",
-            "verify_ssl": False,
-            # Если в личном кабинете выдан готовый Authorization key (Basic ...),
-            # его можно указать здесь вместо client_id/client_secret
-            "authorization_key": "",
             "model": "GigaChat-Pro",
-            # Сетевые настройки для сертификатов/прокси
-            "ca_bundle_file": "",  # путь к 'russian_trusted_root_ca_pem.crt' (или объединённому .crt)
-            "ca_bundle": "",       # альтернативное имя поля
-            "insecure_skip_verify": False,
+            # Включить mTLS и указать клиентский сертификат/ключ
+            "use_mtls": True,
+            "cert_file": "",
+            "key_file": "",
+            # verify: True/False или путь к доверенному корню (НУЦ Минцифры/корп. CA)
+            "verify": "",
+            # (опционально) прокси, если нужен выход через корпоративный прокси
             "proxies": {
                 "https": "",
                 "http": ""
             },
-            "connect_timeout_sec": 5,
-            # mTLS режим прямых REST-запросов
-            "use_mtls": False,
-            "cert_file": "",
-            "key_file": "",
-            # verify может быть True/False или путем к CA файлу
-            "verify": ""
+            "connect_timeout_sec": 5
         }
     },
     "default_params": {
@@ -138,7 +122,7 @@ CONFIG = {
         "kafka": {
             "promql_queries": [
                 'sum(kafka_consumer_fetch_rate{topic !~ "_.+" , topic!~".*searched$", topic!="apps-registry.nsi.document-request"}) by (client_id)',
-                'sum by (topic, consumergroup) (kafka_consumergroup_lag{consumergroup!~"apps-apps-micro-registry-incident-AT.*", topic ! ~ "__.+", topic!~".*searched$", topic!="apps-registry.nsi.document-request"})',
+                'sum by (topic, consumergroup) (kafka_consumergroup_lag{consumergroup!~"apps-apps-micro-registry-incident-AT.*", topic !~ "__.+", topic!~".*searched$", topic!="apps-registry.nsi.document-request"})',
                 'NSI_incident_repository_gauge'
                 '{application="micro-registry-incident-schedule", repository="KafkaRequest"}'
             ],
