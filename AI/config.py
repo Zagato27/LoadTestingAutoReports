@@ -31,7 +31,16 @@ CONFIG = {
             # Если в личном кабинете выдан готовый Authorization key (Basic ...),
             # его можно указать здесь вместо client_id/client_secret
             "authorization_key": "",
-            "model": "GigaChat-Pro"
+            "model": "GigaChat-Pro",
+            # Сетевые настройки для сертификатов/прокси
+            "ca_bundle_file": "",  # путь к 'russian_trusted_root_ca_pem.crt' (или объединённому .crt)
+            "ca_bundle": "",       # альтернативное имя поля
+            "insecure_skip_verify": False,
+            "proxies": {
+                "https": "",
+                "http": ""
+            },
+            "connect_timeout_sec": 5
         }
     },
     "default_params": {
