@@ -14,9 +14,22 @@ CONFIG = {
 
     },
     "llm": {
+        # Провайдер LLM: "perplexity", "openai", "gigachat"
+        "provider": "perplexity",
+        # Для OpenAI-совместимых провайдеров (OpenAI/Perplexity)
         "api_key": "token",
         "model": "sonar-deep-research",
-        "base_url": "https://api.perplexity.ai"
+        "base_url": "https://api.perplexity.ai",
+        # Настройки GigaChat (при provider = "gigachat")
+        "gigachat": {
+            "client_id": "your_client_id",
+            "client_secret": "your_client_secret",
+            "auth_url": "https://ngw.devices.sberbank.ru:9443/api/v2/oauth",
+            "api_base_url": "https://gigachat.devices.sberbank.ru/api/v1",
+            "scope": "GIGACHAT_API_PERS",
+            "verify_ssl": False,
+            "model": "GigaChat-Pro"
+        }
     },
     "default_params": {
         "step": "1m",
