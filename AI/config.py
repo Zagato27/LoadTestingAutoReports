@@ -30,7 +30,8 @@ CONFIG = {
                 "https": "",
                 "http": ""
             },
-            "connect_timeout_sec": 5
+            "connect_timeout_sec": 5,
+            "request_timeout_sec": 120
         }
     },
     "default_params": {
