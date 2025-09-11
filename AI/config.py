@@ -31,7 +31,9 @@ CONFIG = {
                 "http": ""
             },
             "connect_timeout_sec": 5,
-            "request_timeout_sec": 120
+            "request_timeout_sec": 120,
+            # отключить preflight GET /models (если сервер требует другую цепочку CA)
+            "enable_preflight_models": False
         }
     },
     "default_params": {
