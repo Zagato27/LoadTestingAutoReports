@@ -113,7 +113,7 @@ CONFIG = {
                 "JVM: Loaded classes by (application, instance)"
             ]
         },
-        "arangodb": {
+        "database": {
             "promql_queries": [
                 'sum by (pod) (rate(arangodb_http_request_statistics_total_requests_total'
                 '{namespace="arangodb", job!~".*replica.*"}[1m]))',
@@ -125,8 +125,8 @@ CONFIG = {
                 ["service"]
             ],
             "labels": [
-                "ArangoDB: sum of HTTP requests (non-replica)",
-                "ArangoDB: 95th percentile of AQL query time"
+                "Database: sum of HTTP requests (non-replica)",
+                "Database: 95th percentile of query time (P95)"
             ]
         },
         "kafka": {
