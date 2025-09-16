@@ -19,6 +19,13 @@ CONFIG = {
         "gigachat": {
             "api_base_url": "https://gigachat.devices.sberbank.ru/api/v1",
             "model": "GigaChat-Pro",
+            # Управление генерацией (низкая температура, JSON-режим подсказкой)
+            "generation": {
+                "temperature": 0.2,
+                "top_p": 0.9,
+                "max_tokens": 1200,
+                "force_json_in_prompt": True
+            },
             # Включить mTLS и указать клиентский сертификат/ключ
             "use_mtls": True,
             "cert_file": "",
