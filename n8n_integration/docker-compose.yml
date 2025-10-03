@@ -18,17 +18,16 @@ services:
       - N8N_LOG_LEVEL=info
     volumes:
       - n8n_data:/home/node/.n8n
-      - ./n8n_load_testing_workflow.json:/data/workflows/load_testing.json:ro
     networks:
       - n8n-network
     depends_on:
       - ai-analyzer
 
-  # AI Analyzer Microservice
+  # AI Analyzer Microservice (изолированный)
   ai-analyzer:
     build:
       context: .
-      dockerfile: Dockerfile.ai_service
+      dockerfile: Dockerfile
     container_name: ai-analyzer
     restart: unless-stopped
     ports:
@@ -37,14 +36,12 @@ services:
       - AI_SERVICE_HOST=0.0.0.0
       - AI_SERVICE_PORT=5001
       - AI_SERVICE_DEBUG=false
-      # Настройки Prometheus/Grafana из конфига
+      # Настройки из конфига (можно переопределить через .env)
       - PROMETHEUS_URL=${PROMETHEUS_URL:-http://prometheus:9090}
-      - GRAFANA_URL=${GRAFANA_URL:-http://grafana:3000}
     volumes:
-      # Монтируем конфиги (они содержат чувствительные данные)
+      # Конфиги AI (если нужно переопределить)
       - ./AI/config.py:/app/AI/config.py:ro
-      - ./config.py:/app/config.py:ro
-      # Сертификаты для mTLS (если используется)
+      # Сертификаты для mTLS (опционально)
       - ./certs:/app/certs:ro
     networks:
       - n8n-network
@@ -73,6 +70,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    profiles:
+      - production
 
 volumes:
   n8n_data:

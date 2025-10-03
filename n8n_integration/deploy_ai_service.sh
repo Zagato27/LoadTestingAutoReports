@@ -122,7 +122,7 @@ check_certificates() {
 build_images() {
     info "Сборка Docker образов..."
     
-    docker-compose -f docker-compose.n8n.yml build ai-analyzer
+    docker-compose -f docker-compose.yml build ai-analyzer
     
     success "Образы собраны"
 }
@@ -131,7 +131,7 @@ build_images() {
 start_services() {
     info "Запуск сервисов..."
     
-    docker-compose -f docker-compose.n8n.yml up -d
+    docker-compose -f docker-compose.yml up -d
     
     success "Сервисы запущены"
 }
@@ -158,7 +158,7 @@ check_services() {
         curl -s http://localhost:5001/config/check | python3 -m json.tool 2>/dev/null || true
     else
         error "AI-сервис недоступен"
-        info "Проверьте логи: docker-compose -f docker-compose.n8n.yml logs ai-analyzer"
+        info "Проверьте логи: docker-compose -f docker-compose.yml logs ai-analyzer"
         exit 1
     fi
 }
@@ -193,10 +193,10 @@ print_next_steps() {
     echo '     }'"'"
     echo ""
     info "Полезные команды:"
-    echo "  - Логи AI-сервиса: docker-compose -f docker-compose.n8n.yml logs -f ai-analyzer"
-    echo "  - Логи n8n: docker-compose -f docker-compose.n8n.yml logs -f n8n"
-    echo "  - Статус сервисов: docker-compose -f docker-compose.n8n.yml ps"
-    echo "  - Остановка: docker-compose -f docker-compose.n8n.yml down"
+    echo "  - Логи AI-сервиса: docker-compose -f docker-compose.yml logs -f ai-analyzer"
+    echo "  - Логи n8n: docker-compose -f docker-compose.yml logs -f n8n"
+    echo "  - Статус сервисов: docker-compose -f docker-compose.yml ps"
+    echo "  - Остановка: docker-compose -f docker-compose.yml down"
     echo ""
     info "Документация:"
     echo "  - AI_INTEGRATION_GUIDE.md - детальное руководство по AI"
@@ -247,16 +247,16 @@ case "${1:-}" in
         check_services
         ;;
     "logs")
-        docker-compose -f docker-compose.n8n.yml logs -f ai-analyzer
+        docker-compose -f docker-compose.yml logs -f ai-analyzer
         ;;
     "stop")
         info "Остановка сервисов..."
-        docker-compose -f docker-compose.n8n.yml down
+        docker-compose -f docker-compose.yml down
         success "Сервисы остановлены"
         ;;
     "restart")
         info "Перезапуск сервисов..."
-        docker-compose -f docker-compose.n8n.yml restart ai-analyzer
+        docker-compose -f docker-compose.yml restart ai-analyzer
         success "AI-сервис перезапущен"
         ;;
     "clean")
@@ -264,7 +264,7 @@ case "${1:-}" in
         read -p "Продолжить? (y/n) " -n 1 -r
         echo ""
         if [[ $REPLY =~ ^[Yy]$ ]]; then
-            docker-compose -f docker-compose.n8n.yml down -v --rmi all
+            docker-compose -f docker-compose.yml down -v --rmi all
             success "Очистка завершена"
         fi
         ;;

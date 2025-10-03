@@ -1,69 +1,88 @@
-# 🚀 n8n Integration для Load Testing Auto Reports
+# 🚀 n8n Integration - Изолированный проект
 
-Эта директория содержит все необходимое для развертывания системы создания отчетов по нагрузочному тестированию на базе **n8n workflow** с **AI-микросервисом**.
+**Полностью автономная система создания отчетов по нагрузочному тестированию на базе n8n + AI**
+
+## ✨ Особенности
+
+✅ **Полная изоляция** - все зависимости внутри директории  
+✅ **Упрощенный workflow** - без Loki (только Grafana + AI)  
+✅ **AI-анализ** - JVM, Database, Kafka, Microservices  
+✅ **Docker контейнеризация** - docker-compose для всего стека  
+✅ **Автоматизация** - скрипты развертывания и тестирования  
 
 ---
 
-## 📋 Содержание директории
+## 📁 Структура
 
-### 🌟 Workflow и код
-
-| Файл | Описание |
-|------|----------|
-| **n8n_load_testing_workflow_with_ai.json** | ⭐ Основной workflow с AI-интеграцией |
-| **n8n_load_testing_workflow.json** | Базовый workflow (без AI) |
-| **ai_service_for_n8n.py** | Flask REST API для AI-анализа |
-
-### 🐳 Docker
-
-| Файл | Описание |
-|------|----------|
-| **docker-compose.n8n.yml** | Docker Compose для всего стека |
-| **Dockerfile.ai_service** | Docker образ AI-сервиса |
-| **env.example.txt** | Шаблон переменных окружения |
-
-### 🔧 Скрипты
-
-| Файл | Описание |
-|------|----------|
-| **deploy_ai_service.sh** | Автоматическое развертывание |
-| **test_ai_integration.sh** | Автоматическое тестирование |
-
-### 📚 Документация
-
-| Файл | Для кого |
-|------|----------|
-| **START_HERE.md** | ⭐ **НАЧНИТЕ ОТСЮДА** |
-| **QUICK_START_AI.md** | Быстрый старт за 5 минут |
-| **AI_INTEGRATION_GUIDE.md** | Детальное руководство по AI |
-| **README_N8N_MIGRATION.md** | Общая миграция на n8n |
-| **N8N_MIGRATION_GUIDE.md** | Расширенная документация |
-| **README_AI_FILES.md** | Список всех файлов |
+```
+n8n_integration/                    # ← ВСЁ ЗДЕСЬ (изолированно)
+├── 🌟 Workflow
+│   └── n8n_workflow_simple.json        # Упрощенный workflow (Grafana + AI)
+│
+├── 💻 AI-сервис
+│   ├── ai_service_for_n8n.py           # Flask REST API
+│   ├── AI/                             # AI-модуль (копия)
+│   ├── confluence_manager/             # Confluence утилиты (копия)
+│   └── config.py                       # Базовые настройки
+│
+├── 🐳 Docker
+│   ├── docker-compose.yml              # Docker Compose
+│   ├── Dockerfile                      # AI-сервис образ
+│   ├── env.example.txt                 # Шаблон .env
+│   └── requirements.txt                # Python зависимости
+│
+├── 🔧 Скрипты
+│   ├── deploy_ai_service.sh            # Развертывание
+│   └── test_ai_integration.sh          # Тестирование
+│
+└── 📚 Документация
+    └── README.md (этот файл)
+```
 
 ---
 
 ## 🚀 Быстрый старт
 
-### Шаг 1: Подготовка (1 минута)
+### 1. Подготовка (1 минута)
 
 ```bash
-cd n8n_integration
-
-# Создайте .env из шаблона
+# Создайте .env
 cp env.example.txt .env
 
 # Отредактируйте .env
 nano .env
 ```
 
-**Обязательные настройки:**
+**Обязательно настройте:**
 ```bash
 POSTGRES_PASSWORD=your_secure_password
 PROMETHEUS_URL=http://your-prometheus:9090
-GRAFANA_URL=http://your-grafana:3000
 ```
 
-### Шаг 2: Запуск (2 минуты)
+### 2. Настройка AI (1 минута)
+
+Отредактируйте `AI/config.py`:
+
+```python
+CONFIG = {
+    "prometheus": {
+        "url": "http://prometheus:9090"
+    },
+    "llm": {
+        "provider": "gigachat",
+        "gigachat": {
+            "model": "GigaChat-Pro",
+            "base_url": "https://gigachat.devices.sberbank.ru/api/v1",
+            "cert_file": "/app/certs/client.crt",
+            "key_file": "/app/certs/client.key",
+            # ...
+        }
+    },
+    # ... остальная конфигурация
+}
+```
+
+### 3. Запуск (2 минуты)
 
 ```bash
 # Сделайте скрипты исполняемыми
@@ -73,21 +92,37 @@ chmod +x deploy_ai_service.sh test_ai_integration.sh
 ./deploy_ai_service.sh
 ```
 
-### Шаг 3: Настройка n8n (2 минуты)
+### 4. Настройка n8n (2 минуты)
 
 1. Откройте: **http://localhost:5678**
 
 2. **Import workflow:**
    - Settings → Import from File
-   - Выберите: `n8n_load_testing_workflow_with_ai.json`
+   - Выберите: `n8n_workflow_simple.json`
 
 3. **Настройте Credentials:**
-   - Confluence (HTTP Basic Auth)
-   - Grafana (HTTP Basic Auth)
+   
+   **Confluence:**
+   ```
+   Тип: HTTP Basic Auth
+   ID: confluence-creds
+   Username: ваш_логин
+   Password: ваш_пароль
+   ```
+   
+   **Grafana:**
+   ```
+   Тип: HTTP Basic Auth
+   ID: grafana-creds
+   Username: grafana_login
+   Password: grafana_password
+   ```
 
-4. **Активируйте workflow** (кнопка "Active")
+4. **Обновите конфигурацию метрик** в узле "Get Service Config"
 
-### Шаг 4: Тест
+5. **Активируйте workflow** (кнопка "Active")
+
+### 5. Тест
 
 ```bash
 # Быстрая проверка
@@ -113,77 +148,106 @@ curl -X POST http://localhost:5678/webhook/load-testing/report/create \
 └────┬─────┘
      │
      ▼
-┌──────────────────────────────┐
-│      n8n Workflow            │
-│                              │
-│  1. Copy Confluence page     │
-│  2. Parallel execution:      │
-│     ├─ Grafana metrics ─────┐│
-│     ├─ Loki logs       ─────┤│
-│     └─ AI analysis     ─────┤│
-│                             ││
-│  3. Merge all results  ◄────┘│
-│  4. Update Confluence page   │
-└──────────┬───────────────────┘
+┌─────────────────────┐
+│   n8n Workflow      │
+│                     │
+│  1. Copy page       │
+│  2. Parallel:       │
+│     ├─ Grafana ────┐│
+│     └─ AI ─────────┤│
+│                    ││
+│  3. Merge      ◄───┘│
+│  4. Update page     │
+└──────────┬──────────┘
            │
            ▼
-┌──────────────────────────────┐
-│    AI Analyzer Service       │
-│    (ai_service_for_n8n.py)   │
-│                              │
-│  Flask REST API (Port 5001)  │
-│                              │
-│  Endpoints:                  │
-│  - GET  /health              │
-│  - GET  /config/check        │
-│  - POST /analyze             │
-└──────────┬───────────────────┘
+┌─────────────────────┐
+│  AI Microservice    │
+│  (Flask REST API)   │
+│                     │
+│  /health            │
+│  /analyze           │
+└──────────┬──────────┘
            │
            ▼
-┌──────────────────────────────┐
-│    ../AI/main.py             │
-│    (Existing AI module)      │
-│                              │
-│  - Prometheus queries        │
-│  - GigaChat LLM              │
-│  - Domain analysis           │
-└──────────────────────────────┘
+┌─────────────────────┐
+│    ./AI/main.py     │
+│                     │
+│  - Prometheus       │
+│  - GigaChat         │
+│  - Analysis         │
+└─────────────────────┘
 ```
 
----
+**Что убрано по сравнению с оригиналом:**
+- ❌ Loki логи
+- ❌ Зависимости от родительских директорий
 
-## 📊 Что делает система
-
-### Сбор данных (параллельно)
-
-1. **Grafana:**
-   - Загружает изображения панелей
-   - Прикрепляет как вложения в Confluence
-   - Заменяет плейсхолдеры `$$metric_name$$`
-
-2. **Loki:**
-   - Собирает логи ERROR за период
-   - Сохраняет в `.log` файлы
-   - Прикрепляет в Confluence
-   - Заменяет плейсхолдеры `$$service_name$$`
-
-3. **AI-анализ:**
-   - Загружает метрики из Prometheus
-   - Анализирует 4 домена:
-     * JVM (память, CPU, GC)
-     * Database (подключения, запросы)
-     * Kafka (consumer lag, throughput)
-     * Microservices (RPS, response times)
-   - Генерирует выводы и рекомендации
-   - Заменяет плейсхолдеры `$$answer_jvm$$`, `$$answer_database$$`, и т.д.
-
-### Финальное обновление
-
-Все плейсхолдеры заменяются **одним проходом**, страница обновляется и возвращается ссылка на готовый отчет.
+**Что осталось:**
+- ✅ Grafana метрики
+- ✅ AI-анализ (4 домена)
+- ✅ Confluence интеграция
+- ✅ Полная изоляция
 
 ---
 
-## 🔧 Управление сервисами
+## 📊 AI-анализ
+
+AI автоматически анализирует:
+
+### 1. JVM метрики
+- Heap/Non-Heap память
+- CPU процессов
+- GC активность
+
+### 2. Database метрики
+- Активные подключения
+- Времена запросов
+- Блокировки
+
+### 3. Kafka метрики
+- Consumer lag
+- Fetch rate
+- Throughput
+
+### 4. Microservices метрики
+- RPS
+- Response times
+- Error rates
+
+**Результат:** Структурированный отчет с выводами и рекомендациями
+
+---
+
+## ⚙️ Конфигурация
+
+### Метрики
+
+Откройте workflow в n8n → узел **"Get Service Config"**
+
+```javascript
+const METRICS_CONFIG = {
+  "NSI": {
+    "confluence_url": "https://confluence.company.com",
+    "page_sample_id": "682908703",
+    "page_parent_id": "882999920",
+    "grafana_base_url": "http://grafana:3000",
+    "metrics": [
+      {
+        "name": "RPS",
+        "grafana_url": "/render/d-solo/..."
+      },
+      // ... добавьте все ваши метрики
+    ]
+  }
+};
+```
+
+**Примечание:** Секция `logs` удалена (Loki не используется)
+
+---
+
+## 🔧 Управление
 
 ### Развертывание
 
@@ -193,15 +257,13 @@ curl -X POST http://localhost:5678/webhook/load-testing/report/create \
 ./deploy_ai_service.sh build    # Сборка образов
 ./deploy_ai_service.sh start    # Запуск сервисов
 ./deploy_ai_service.sh stop     # Остановка
-./deploy_ai_service.sh restart  # Перезапуск AI-сервиса
-./deploy_ai_service.sh logs     # Просмотр логов
-./deploy_ai_service.sh clean    # Полная очистка
+./deploy_ai_service.sh logs     # Логи AI-сервиса
 ```
 
 ### Тестирование
 
 ```bash
-./test_ai_integration.sh        # Полный набор тестов (7 проверок)
+./test_ai_integration.sh        # Полный набор тестов
 ./test_ai_integration.sh quick  # Быстрая проверка
 ./test_ai_integration.sh ai-only # Только AI-сервис
 ```
@@ -210,77 +272,20 @@ curl -X POST http://localhost:5678/webhook/load-testing/report/create \
 
 ```bash
 # Запуск
-docker-compose -f docker-compose.n8n.yml up -d
+docker-compose up -d
 
 # Статус
-docker-compose -f docker-compose.n8n.yml ps
+docker-compose ps
 
 # Логи
-docker-compose -f docker-compose.n8n.yml logs -f ai-analyzer
-docker-compose -f docker-compose.n8n.yml logs -f n8n
+docker-compose logs -f ai-analyzer
+docker-compose logs -f n8n
 
 # Остановка
-docker-compose -f docker-compose.n8n.yml down
+docker-compose down
 
-# Полная очистка (с volumes)
-docker-compose -f docker-compose.n8n.yml down -v
-```
-
----
-
-## 📝 Конфигурация
-
-### Метрики и логи
-
-Откройте workflow в n8n → узел **"Get Service Config"**
-
-Обновите `METRICS_CONFIG`:
-
-```javascript
-const METRICS_CONFIG = {
-  "NSI": {
-    "confluence_url": "https://confluence.company.com",
-    "page_sample_id": "682908703",
-    "page_parent_id": "882999920",
-    "grafana_base_url": "http://grafana:3000",
-    "loki_url": "http://loki:3000/loki/api/v1/query_range",
-    "metrics": [
-      {
-        "name": "RPS",
-        "grafana_url": "/render/d-solo/dashboard/..."
-      }
-      // ... добавьте все ваши метрики
-    ],
-    "logs": [
-      {
-        "placeholder": "service-name",
-        "filter_query": '{namespace="apps"} |= "ERROR"'
-      }
-      // ... добавьте все ваши логи
-    ]
-  }
-};
-```
-
-### AI-конфигурация
-
-Отредактируйте `../AI/config.py`:
-
-```python
-CONFIG = {
-    "prometheus": {
-        "url": "http://prometheus:9090"
-    },
-    "llm": {
-        "provider": "gigachat",
-        "gigachat": {
-            "model": "GigaChat-Pro",
-            "cert_file": "/app/certs/client.crt",
-            "key_file": "/app/certs/client.key",
-            # ...
-        }
-    }
-}
+# Полная очистка
+docker-compose down -v
 ```
 
 ---
@@ -291,31 +296,31 @@ CONFIG = {
 
 ```bash
 # Логи
-docker-compose -f docker-compose.n8n.yml logs ai-analyzer
+docker-compose logs ai-analyzer
 
 # Проверка конфигурации
 curl http://localhost:5001/config/check | jq .
 
 # Пересборка
-docker-compose -f docker-compose.n8n.yml build ai-analyzer
-docker-compose -f docker-compose.n8n.yml up -d ai-analyzer
+docker-compose build ai-analyzer
+docker-compose up -d ai-analyzer
 ```
 
 ### n8n недоступен
 
 ```bash
 # Логи
-docker-compose -f docker-compose.n8n.yml logs n8n
+docker-compose logs n8n
 
 # Перезапуск
-docker-compose -f docker-compose.n8n.yml restart n8n
-
-# Проверка портов
-netstat -an | grep 5678
+docker-compose restart n8n
 ```
 
 ### AI возвращает "insufficient_data"
 
+Проблема: Нет метрик в Prometheus за указанный период
+
+**Решение:**
 ```bash
 # Проверка Prometheus
 curl http://prometheus:9090/api/v1/query?query=up
@@ -328,43 +333,79 @@ end=1708523400&\
 step=60" | jq .
 ```
 
-Больше информации: [AI_INTEGRATION_GUIDE.md](AI_INTEGRATION_GUIDE.md) → раздел Troubleshooting
+---
+
+## 📝 API
+
+### Создание отчета
+
+```bash
+POST http://localhost:5678/webhook/load-testing/report/create
+
+Body:
+{
+  "start": "2025-02-21T11:30",
+  "end": "2025-02-21T14:10",
+  "service": "NSI"
+}
+```
+
+**Успешный ответ:**
+```json
+{
+  "status": "success",
+  "message": "Report created successfully",
+  "page_id": "123456789",
+  "page_url": "https://confluence.../viewpage.action?pageId=123456789",
+  "service": "NSI",
+  "start": 1708513800000,
+  "end": 1708523400000
+}
+```
+
+### AI-сервис
+
+```bash
+# Healthcheck
+GET http://localhost:5001/health
+
+# Конфигурация
+GET http://localhost:5001/config/check
+
+# Анализ
+POST http://localhost:5001/analyze
+Body: {"start": 1708513800000, "end": 1708523400000}
+```
 
 ---
 
-## 📚 Полная документация
+## ✅ Что реализовано
 
-1. **[START_HERE.md](START_HERE.md)** ⭐ - начните отсюда
-2. **[QUICK_START_AI.md](QUICK_START_AI.md)** - быстрый старт
-3. **[AI_INTEGRATION_GUIDE.md](AI_INTEGRATION_GUIDE.md)** - детальное руководство
-4. **[README_N8N_MIGRATION.md](README_N8N_MIGRATION.md)** - миграция с Python
-5. **[README_AI_FILES.md](README_AI_FILES.md)** - список всех файлов
-
----
-
-## ✅ Что работает
-
-- ✅ n8n Workflow с 27 узлами
-- ✅ AI-микросервис (Flask REST API)
+- ✅ n8n Workflow (упрощенный)
+- ✅ AI-микросервис (изолированный)
+- ✅ Grafana интеграция
+- ✅ AI-анализ (4 домена)
 - ✅ Docker контейнеризация
-- ✅ Параллельная обработка (Grafana + Loki + AI)
-- ✅ Автоматические скрипты развертывания
-- ✅ Автоматические тесты
-- ✅ Полная документация
+- ✅ Скрипты автоматизации
+- ✅ Полная изоляция
+
+## ❌ Что убрано
+
+- ❌ Loki логи
+- ❌ Зависимости от родительских директорий
+- ❌ Сложные workflow с множеством узлов
 
 ---
 
 ## 🎉 Готово к использованию!
 
-Откройте **[START_HERE.md](START_HERE.md)** и следуйте инструкциям.
+Все зависимости изолированы, проект полностью автономный.
+
+**Следующие шаги:**
+1. Настройте `.env`
+2. Отредактируйте `AI/config.py`
+3. Запустите `./deploy_ai_service.sh`
+4. Импортируйте workflow в n8n
+5. Создайте первый отчет!
 
 Удачи! 🚀
-
----
-
-## 📞 Поддержка
-
-- **Быстрый старт:** [QUICK_START_AI.md](QUICK_START_AI.md)
-- **Troubleshooting:** [AI_INTEGRATION_GUIDE.md](AI_INTEGRATION_GUIDE.md)
-- **Все файлы:** [README_AI_FILES.md](README_AI_FILES.md)
-
