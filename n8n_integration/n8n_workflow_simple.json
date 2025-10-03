@@ -2,17 +2,51 @@
   "name": "Load Testing Reports - Grafana + AI",
   "nodes": [
     {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1440,
+        300
+      ],
+      "id": "manual-trigger",
+      "name": "Manual Trigger"
+    },
+    {
       "parameters": {
-        "path": "load-testing/report/create",
-        "options": {},
-        "responseMode": "responseNode"
+        "assignments": {
+          "assignments": [
+            {
+              "id": "input-start",
+              "name": "start",
+              "value": "2025-02-21T11:30",
+              "type": "string"
+            },
+            {
+              "id": "input-end",
+              "name": "end",
+              "value": "2025-02-21T14:10",
+              "type": "string"
+            },
+            {
+              "id": "input-service",
+              "name": "service",
+              "value": "NSI",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
       },
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2,
-      "position": [-1200, 300],
-      "id": "webhook-trigger",
-      "name": "Webhook Trigger",
-      "webhookId": "load-testing-webhook"
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1200,
+        300
+      ],
+      "id": "user-input",
+      "name": "User Input",
+      "notes": "Измените значения перед запуском workflow"
     },
     {
       "parameters": {
@@ -21,31 +55,31 @@
             {
               "id": "start-time",
               "name": "start",
-              "value": "={{ $json.body.start }}",
+              "value": "={{ $json.start }}",
               "type": "string"
             },
             {
               "id": "end-time",
               "name": "end",
-              "value": "={{ $json.body.end }}",
+              "value": "={{ $json.end }}",
               "type": "string"
             },
             {
               "id": "service-name",
               "name": "service",
-              "value": "={{ $json.body.service }}",
+              "value": "={{ $json.service }}",
               "type": "string"
             },
             {
               "id": "start-ts",
               "name": "start_timestamp",
-              "value": "={{ new Date($json.body.start).getTime() }}",
+              "value": "={{ new Date($json.start).getTime() }}",
               "type": "number"
             },
             {
               "id": "end-ts",
               "name": "end_timestamp",
-              "value": "={{ new Date($json.body.end).getTime() }}",
+              "value": "={{ new Date($json.end).getTime() }}",
               "type": "number"
             }
           ]
@@ -54,7 +88,10 @@
       },
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [-960, 300],
+      "position": [
+        -960,
+        300
+      ],
       "id": "parse-input",
       "name": "Parse Input"
     },
@@ -104,7 +141,10 @@
       },
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
-      "position": [-720, 300],
+      "position": [
+        -720,
+        480
+      ],
       "id": "validate-input",
       "name": "Validate Input"
     },
@@ -114,7 +154,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [-480, 300],
+      "position": [
+        -480,
+        300
+      ],
       "id": "get-service-config",
       "name": "Get Service Config",
       "notes": "Конфигурация без логов Loki"
@@ -128,7 +171,10 @@
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [-240, 300],
+      "position": [
+        -240,
+        300
+      ],
       "id": "get-template-page",
       "name": "Get Template Page",
       "credentials": {
@@ -151,7 +197,10 @@
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [0, 300],
+      "position": [
+        0,
+        60
+      ],
       "id": "copy-page",
       "name": "Copy Confluence Page",
       "credentials": {
@@ -167,7 +216,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [240, 120],
+      "position": [
+        240,
+        -120
+      ],
       "id": "prepare-metrics",
       "name": "Prepare Metrics"
     },
@@ -186,7 +238,10 @@
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [480, 120],
+      "position": [
+        480,
+        120
+      ],
       "id": "download-grafana-image",
       "name": "Download Grafana Image",
       "credentials": {
@@ -225,7 +280,10 @@
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [720, 120],
+      "position": [
+        720,
+        120
+      ],
       "id": "upload-grafana-to-confluence",
       "name": "Upload to Confluence",
       "credentials": {
@@ -263,7 +321,10 @@
       },
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [960, 120],
+      "position": [
+        960,
+        120
+      ],
       "id": "prepare-metric-placeholder",
       "name": "Prepare Metric Placeholder"
     },
@@ -280,7 +341,10 @@
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [240, 480],
+      "position": [
+        240,
+        -120
+      ],
       "id": "call-ai-analyzer",
       "name": "Call AI Analyzer",
       "notes": "AI анализ метрик (5 мин timeout)"
@@ -291,7 +355,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [480, 480],
+      "position": [
+        480,
+        480
+      ],
       "id": "process-ai-results",
       "name": "Process AI Results"
     },
@@ -303,7 +370,10 @@
       },
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3,
-      "position": [1200, 300],
+      "position": [
+        1200,
+        300
+      ],
       "id": "merge-all-placeholders",
       "name": "Merge Grafana + AI"
     },
@@ -313,7 +383,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1440, 300],
+      "position": [
+        1440,
+        300
+      ],
       "id": "aggregate-all-placeholders",
       "name": "Aggregate Placeholders"
     },
@@ -326,7 +399,10 @@
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1680, 300],
+      "position": [
+        1680,
+        300
+      ],
       "id": "get-current-page",
       "name": "Get Current Page",
       "credentials": {
@@ -342,7 +418,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1920, 300],
+      "position": [
+        1920,
+        300
+      ],
       "id": "replace-placeholders",
       "name": "Replace Placeholders"
     },
@@ -359,7 +438,10 @@
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [2160, 300],
+      "position": [
+        2160,
+        300
+      ],
       "id": "update-confluence-page",
       "name": "Update Confluence Page",
       "credentials": {
@@ -368,74 +450,6 @@
           "name": "Confluence Credentials"
         }
       }
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "status",
-              "name": "status",
-              "value": "success",
-              "type": "string"
-            },
-            {
-              "id": "message",
-              "name": "message",
-              "value": "Report created successfully",
-              "type": "string"
-            },
-            {
-              "id": "page-id",
-              "name": "page_id",
-              "value": "={{ $('Copy Confluence Page').item.json.id }}",
-              "type": "string"
-            },
-            {
-              "id": "page-url",
-              "name": "page_url",
-              "value": "={{ $('Get Service Config').item.json.confluence_url }}/pages/viewpage.action?pageId={{ $('Copy Confluence Page').item.json.id }}",
-              "type": "string"
-            },
-            {
-              "id": "service",
-              "name": "service",
-              "value": "={{ $('Parse Input').item.json.service }}",
-              "type": "string"
-            },
-            {
-              "id": "start",
-              "name": "start",
-              "value": "={{ $('Parse Input').item.json.start_timestamp }}",
-              "type": "number"
-            },
-            {
-              "id": "end",
-              "name": "end",
-              "value": "={{ $('Parse Input').item.json.end_timestamp }}",
-              "type": "number"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [2400, 300],
-      "id": "success-response",
-      "name": "Success Response"
-    },
-    {
-      "parameters": {
-        "respondWith": "json",
-        "responseBody": "={{ $json }}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.1,
-      "position": [2640, 300],
-      "id": "send-success",
-      "name": "Send Response"
     },
     {
       "parameters": {
@@ -453,23 +467,12 @@
       },
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [-480, 520],
+      "position": [
+        -480,
+        720
+      ],
       "id": "error-response",
       "name": "Error Response"
-    },
-    {
-      "parameters": {
-        "respondWith": "json",
-        "responseBody": "={{ { status: 'error', message: $json.error } }}",
-        "options": {
-          "responseCode": 400
-        }
-      },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.1,
-      "position": [-240, 520],
-      "id": "send-error",
-      "name": "Send Error"
     },
     {
       "parameters": {
@@ -479,23 +482,15 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [-1200, -100],
+      "position": [
+        -1200,
+        -100
+      ],
       "id": "workflow-description",
       "name": "Workflow Description"
     }
   ],
   "connections": {
-    "Webhook Trigger": {
-      "main": [
-        [
-          {
-            "node": "Parse Input",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Parse Input": {
       "main": [
         [
@@ -684,22 +679,25 @@
         ]
       ]
     },
-    "Success Response": {
+    "Error Response": {
+      "main": []
+    },
+    "Manual Trigger": {
       "main": [
         [
           {
-            "node": "Send Response",
+            "node": "User Input",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Error Response": {
+    "User Input": {
       "main": [
         [
           {
-            "node": "Send Error",
+            "node": "Parse Input",
             "type": "main",
             "index": 0
           }
@@ -718,4 +716,3 @@
   "id": "load-testing-simple",
   "tags": []
 }
-
