@@ -14,7 +14,9 @@ n8n_integration/                      # Изолированный проект
 │   │   └── prompts/                         # Промпты для LLM
 │   ├── confluence_manager/                  # Confluence утилиты (копия)
 │   │   └── update_confluence_template.py
-│   └── config.py                    (652B)  # Базовые настройки
+│   ├── config.py                    (652B)  # Базовые настройки
+│   ├── metrics_config.py            (14K)   # Полная конфигурация метрик
+│   └── metrics_config_example.py    (5.7K)  # Упрощенный пример
 │
 ├── 🐳 Docker
 │   ├── docker-compose.yml           (2.1K) # Docker Compose стек
@@ -29,6 +31,7 @@ n8n_integration/                      # Изолированный проект
 └── 📚 Документация
     ├── README.md                    (10K)  # Главная документация
     ├── QUICKSTART.md                (4.7K) # Быстрый старт
+    ├── METRICS_CONFIG_GUIDE.md              # Настройка метрик
     └── STRUCTURE.md                         # Этот файл
 ```
 
