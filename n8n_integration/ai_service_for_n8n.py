@@ -9,10 +9,34 @@ from flask import Flask, request, jsonify
 from AI.main import uploadFromLLM
 from confluence_manager.update_confluence_template import render_llm_markdown
 import logging
+import math
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+def _parse_interval(payload: dict) -> tuple[float, float]:
+    """Проверяет и преобразует start/end в секунды (float)."""
+    start_raw = payload.get("start")
+    end_raw = payload.get("end")
+
+    if start_raw is None or end_raw is None:
+        raise ValueError("Missing required parameters: start, end")
+
+    try:
+        start_ms = float(start_raw)
+        end_ms = float(end_raw)
+    except (TypeError, ValueError):
+        raise ValueError("Parameters start and end must be numeric timestamps in milliseconds")
+
+    if any(math.isnan(val) or math.isinf(val) for val in (start_ms, end_ms)):
+        raise ValueError("Parameters start and end must be finite numbers")
+
+    if end_ms <= start_ms:
+        raise ValueError("Parameter end must be greater than start")
+
+    return start_ms / 1000.0, end_ms / 1000.0
 
 
 @app.route('/health', methods=['GET'])
@@ -53,24 +77,25 @@ def analyze():
         data = request.json
         
         # Валидация входных данных
-        if not data:
+        if not isinstance(data, dict):
             return jsonify({
                 "status": "error",
                 "message": "No JSON data provided"
             }), 400
-        
-        start = data.get('start')
-        end = data.get('end')
-        
-        if not start or not end:
+
+        if not data:
             return jsonify({
                 "status": "error",
-                "message": "Missing required parameters: start, end"
+                "message": "Request body must contain start and end timestamps"
             }), 400
         
-        # Конвертируем из миллисекунд в секунды для uploadFromLLM
-        start_ts = float(start) / 1000.0
-        end_ts = float(end) / 1000.0
+        try:
+            start_ts, end_ts = _parse_interval(data)
+        except ValueError as err:
+            return jsonify({
+                "status": "error",
+                "message": str(err)
+            }), 400
         
         logger.info(f"Starting AI analysis for period: {start_ts} - {end_ts}")
         
@@ -145,17 +170,18 @@ def analyze_domain(domain):
     """
     try:
         data = request.json
-        start = data.get('start')
-        end = data.get('end')
-        
-        if not start or not end:
+        if not isinstance(data, dict):
             return jsonify({
                 "status": "error",
-                "message": "Missing required parameters: start, end"
+                "message": "No JSON data provided"
             }), 400
-        
-        start_ts = float(start) / 1000.0
-        end_ts = float(end) / 1000.0
+        try:
+            start_ts, end_ts = _parse_interval(data)
+        except ValueError as err:
+            return jsonify({
+                "status": "error",
+                "message": str(err)
+            }), 400
         
         logger.info(f"Analyzing domain '{domain}' for period: {start_ts} - {end_ts}")
         

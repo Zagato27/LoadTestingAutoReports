@@ -4,15 +4,6 @@ CONFIG = {
     "prometheus": {
         "url": "http://prometheus.apps.url"
     },
-    "time_range": {
-        # Примерные числа: берем UNIX-время в секундах
-        # "start_ts": 1740126463,
-        # "end_ts": 1740136370
-        "start_ts": "2025-02-21T11:30",
-        "end_ts": "2025-02-21T14:10"
-    
-
-    },
     "llm": {
         # Используем только прямые REST-вызовы GigaChat по mTLS
         "provider": "gigachat",
